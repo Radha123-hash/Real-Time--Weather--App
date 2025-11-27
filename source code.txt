@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Real-Time Weather App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #277dc8, #6726df);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      width: 380px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      padding: 20px 24px 26px;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #0b3c5d;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 18px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #4facfe;
+      box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.25);
+    }
+
+    button {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      background: #0b7dda;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background:gainsboro;
+    }
+
+    .result {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #eee;
+      display: none; /* initially hidden */
+    }
+
+    .city-name {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #0b3c5d;
+    }
+
+    .temp-main {
+      font-size: 36px;
+      font-weight: 700;
+      color: #ff7b00;
+      margin: 4px 0 2px;
+    }
+
+    .condition {
+      font-size: 14px;
+      text-transform: capitalize;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .detail-box {
+      background: #f3f8ff;
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    .detail-label {
+      color: #777;
+      font-size: 12px;
+    }
+
+    .detail-value {
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .error {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #b00020;
+      display: none;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 11px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="title">🌦 Real-Time Weather</div>
+    <div class="subtitle">Enter any city name and get live weather details</div>
+
+    <div class="form-row">
+      <input type="text" id="cityInput" placeholder="e.g. Delhi, London, Mumbai">
+      <button onclick="getWeather()">Search</button>
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <div id="result" class="result">
+      <div class="city-name" id="cityName"></div>
+      <div class="temp-main" id="temperature"></div>
+      <div class="condition" id="condition"></div>
+
+      <div class="details-grid">
+        <div class="detail-box">
+          <div class="detail-label">Feels Like</div>
+          <div class="detail-value" id="feelsLike"></div>
+        </div>
+        <div class="detail-box">
+          <div class="detail-label">Humidity</div>
+          <div class="detail-value" id="humidity"></div>
+        </div>
+        <div class="detail-box">
+          <div class="detail-label">Pressure</div>
+          <div class="detail-value" id="pressure"></div>
+        </div>
+        <div class="detail-box">
+          <div class="detail-label">Wind Speed</div>
+          <div class="detail-value" id="wind"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Minor Project – Real-Time Weather App (HTML + CSS + JS + OpenWeather API)
+    </div>
+  </div>
+
+  <script>
+    const API_KEY = "64a6fd8d0d4932d6dfd62c7d197a8875"; // yahan apni OpenWeather wali key daalo
+
+    async function getWeather() {
+      const city = document.getElementById("cityInput").value.trim();
+      const errorDiv = document.getElementById("error");
+      const resultDiv = document.getElementById("result");
+
+      errorDiv.style.display = "none";
+      resultDiv.style.display = "none";
+
+      if (!city) {
+        errorDiv.textContent = "Please enter a city name.";
+        errorDiv.style.display = "block";
+        return;
+      }
+
+      try {
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error("City not found");
+        }
+
+        const data = await response.json();
+
+        document.getElementById("cityName").textContent =
+          data.name + ", " + data.sys.country;
+        document.getElementById("temperature").textContent =
+          Math.round(data.main.temp) + "°C";
+        document.getElementById("condition").textContent =
+          data.weather[0].description;
+
+        document.getElementById("feelsLike").textContent =
+          Math.round(data.main.feels_like) + "°C";
+        document.getElementById("humidity").textContent =
+          data.main.humidity + " %";
+        document.getElementById("pressure").textContent =
+          data.main.pressure + " hPa";
+        document.getElementById("wind").textContent =
+          data.wind.speed + " m/s";
+
+        resultDiv.style.display = "block";
+
+      } catch (err) {
+        errorDiv.textContent = "City not found or network error.";
+        errorDiv.style.display = "block";
+      }
+    }
+
+    // Enter dabane par bhi search ho
+    document.getElementById("cityInput").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        getWeather();
+      }
+    });
+  </script>
+</body>
+</html>
