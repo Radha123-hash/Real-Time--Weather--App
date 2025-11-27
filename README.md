@@ -37,6 +37,11 @@ OpenWeather API – Live weather data source
 This project is designed as a minor project for students learning:
 
 API Integration
+Source code: "C:\Users\Lenovo\Desktop\source code.txt"
+Output screenshot: 
+Login page: "C:\Users\Lenovo\Desktop\login page.jpg"
+Output1:"C:\Users\Lenovo\Desktop\output1.jpg"
+Output2:"C:\Users\Lenovo\Desktop\output2.jpg"
 
 Web development fundamentals
 
